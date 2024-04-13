@@ -62,17 +62,14 @@ def delete_qr_code(file_path: Path):
 def create_directory(directory_path: Path):
     """
     Creates a directory at the specified path if it doesn't already exist.
-    Parameters:
-    - directory_path (Path): The filesystem path of the directory to create.
     """
-    logging.debug('Attempting to create directory')
     try:
-        directory_path.mkdir(parents=True, exist_ok=True)  # Create the directory and any parent directories
-    except FileExistsError:
-        logging.info(f"Directory already exists: {directory_path}")
+        directory_path.mkdir(parents=True, exist_ok=True)
+        logging.info(f"Directory created or already exists: {directory_path}")
     except PermissionError as e:
         logging.error(f"Permission denied when trying to create directory {directory_path}: {e}")
-        raise
+        # Handle the permission error, e.g., by not starting the app or bypassing certain initializations.
+        raise RuntimeError(f"Failed to create directory due to permission issues: {directory_path}")
     except Exception as e:
         logging.error(f"Unexpected error creating directory {directory_path}: {e}")
         raise

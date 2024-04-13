@@ -13,7 +13,8 @@ load_dotenv()
 # If not specified in the environment, it defaults to './qr_codes'.
 # app/config.py
 # Example change in app/config.py
-QR_DIRECTORY = Path(os.getenv('QR_DIRECTORY', '/home/hemanjali/qr_codes'))
+QR_DIRECTORY = Path(os.getenv('QR_DIRECTORY', '/tmp/qr_codes'))
+
 
 
 # FILL_COLOR determines the color of the QR code itself. Defaults to 'red'.
