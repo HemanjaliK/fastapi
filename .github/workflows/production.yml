@@ -7,20 +7,23 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.10'  # Correct version specification
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Run tests
-        run: pytest -s
+      build-and-test:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v2
+          - name: Set up Python
+            uses: actions/setup-python@v2
+            with:
+              python-version: '3.10'
+          - name: Install Dependencies
+            run: pip install -r requirements.txt
+          - name: Run Tests
+            run: pytest -s
+          - name: Upload Artifacts
+            if: failure()  # Only upload if the workflow fails
+            uses: actions/upload-artifact@v2
+            with:
+              name: logs
+              path: path/to/logs  # Specify the path to any logs or files you want to examine
+    
     
