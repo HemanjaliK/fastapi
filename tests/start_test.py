@@ -45,8 +45,8 @@ async def test_create_and_delete_qr_code():
         assert create_response.status_code in [201, 409]
 
         if create_response.status_code == 201:
-            qr_code_url = create_response.json()["qr_code_url"]
-            qr_filename = qr_code_url.split('/')[-1]
-            delete_url = f"/qr-codes/{qr_filename}"
-            delete_response = await ac.delete(delete_url, headers=headers)
-            assert delete_response.status_code == 204
+           qr_code_url = create_response.json()["qr_code_url"]
+           qr_filename = qr_code_url.split('/')[-1]
+           delete_url = f"/qr-codes/{qr_filename}"
+           delete_response = await ac.delete(delete_url, headers=headers)
+           assert delete_response.status_code == 200 

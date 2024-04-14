@@ -62,6 +62,7 @@ async def list_qr_codes_endpoint(token: str = Depends(oauth2_scheme)):
     ) for qr_file in qr_files]
     return responses
 
+# In app/routers/qr_code.py
 @router.delete("/qr-codes/{qr_filename}")
 async def delete_qr_code(qr_filename: str):
     logging.info(f"Deleting QR code: {qr_filename}.")
@@ -71,5 +72,6 @@ async def delete_qr_code(qr_filename: str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="QR code not found")
 
     delete_qr_code(qr_code_path)
-    # No need to generate or return any links since the 204 response should not contain a body
-    return {"message": "QR code deleted successfully"}
+    # Using Response to explicitly return a 204 status
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
