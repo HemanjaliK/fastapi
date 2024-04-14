@@ -1,29 +1,73 @@
-name: Python application test
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-      build-and-test:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v2
-          - name: Set up Python
-            uses: actions/setup-python@v2
-            with:
-              python-version: '3.10'
-          - name: Install Dependencies
-            run: pip install -r requirements.txt
-          - name: Run Tests
-            run: pytest -s
-          - name: Upload Artifacts
-            if: failure()  # Only upload if the workflow fails
-            uses: actions/upload-artifact@v2
-            with:
-              name: logs
-              path: path/to/logs  # Specify the path to any logs or files you want to examine
-    
-    
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.10.12] # Define Python versions here
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          
+      - name: Cache Python packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Run tests with Pytest
+        run: pytest
+
+  build-and-push-docker:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: kaw393939/devops_demo:${{ github.sha }} # Uses the Git SHA for tagging
+          platforms: linux/amd64,linux/arm64 # Multi-platform support
+          cache-from: type=registry,ref=kaw393939/devops_demo:cache
+          cache-to: type=inline,mode=max
+          
+      - name: Scan the Docker image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'kaw393939/devops_demo:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1' # Fail the job if vulnerabilities are found
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
