@@ -55,3 +55,17 @@ async def test_create_and_delete_qr_code():
             qr_filename = qr_code_url.split('/')[-1]
             delete_response = await ac.delete(f"/qr-codes/{qr_filename}", headers=headers)
             assert delete_response.status_code == 204  # No Content, successfully deleted
+
+@app.delete("/qr-codes/{qr_filename}")
+async def delete_qr_code(qr_filename: str):
+    file_path = QR_DIRECTORY / qr_filename
+    if not file_path.exists():
+        logger.error(f"File not found: {file_path}")
+        raise HTTPException(status_code=404, detail="File not found")
+    try:
+        file_path.unlink()
+        logger.info(f"File deleted: {file_path}")
+        return Response(status_code=204)
+    except Exception as e:
+        logger.error(f"Error deleting file: {e}")
+        raise HTTPException(status_code=422, detail=str(e))
