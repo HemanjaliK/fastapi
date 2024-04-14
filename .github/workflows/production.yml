@@ -1,4 +1,4 @@
-name: AWS Deployment
+name: Deploy to AWS
 
 on:
   push:
@@ -6,33 +6,32 @@ on:
       - main
 
 jobs:
-  deploy:
+  deployment:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
 
     steps:
-    - name: Checkout repository
+    - name: Checkout Code
       uses: actions/checkout@v2
 
-    - name: Configure AWS credentials
+    - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-region: your-region  # Specify your AWS region
-        role-to-assume: your-role-arn  # ARN of the role to assume
-        role-duration-seconds: 3600  # Session duration in seconds
-        role-session-name: GitHubActionsSession  # Optional session name
-        role-skip-session-tagging: false  # Tags the session with GitHub Actions info if true
-        audience: sts.amazonaws.com  # The intended recipient of the credentials
+        aws-region: your-region                  # Replace 'your-region' with your AWS region (e.g., us-east-1)
+        role-to-assume: your-role-arn            # Replace 'your-role-arn' with the ARN of the role to assume
+        role-duration-seconds: 3600              # Session duration
+        role-session-name: GitHubActionsSession  # Name for the role session
+        role-skip-session-tagging: false         # Enable session tagging for better traceability
+        audience: sts.amazonaws.com              # Intended recipient of the credentials
 
-    - name: Additional AWS Actions
+    - name: Execute AWS Commands
       run: |
-        # Your AWS CLI commands or scripts that use AWS credentials
+        # Example AWS CLI Command
         aws s3 ls
 
-    - name: Clean up Actions
-      if: always()
+    - name: Additional Deployment Steps
       run: |
-        # Any cleanup tasks or final steps
-        echo "Clean up complete"
+        echo "Perform additional deployment steps"
+
+    - name: Clean Up
+      run: |
+        echo "Clean up resources or temporary files"
