@@ -1,4 +1,4 @@
-name: Deploy to AWS ECR
+name: AWS Deployment
 
 on:
   push:
@@ -6,36 +6,33 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
       id-token: write
+      contents: read
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v2
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-region: your-region
-        role-to-assume: your-role-arn
-        role-duration-seconds: 3600
+        aws-region: your-region  # Specify your AWS region
+        role-to-assume: your-role-arn  # ARN of the role to assume
+        role-duration-seconds: 3600  # Session duration in seconds
+        role-session-name: GitHubActionsSession  # Optional session name
+        role-skip-session-tagging: false  # Tags the session with GitHub Actions info if true
+        audience: sts.amazonaws.com  # The intended recipient of the credentials
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Build, tag, and push image to Amazon ECR
-      env:
-        ECR_REPOSITORY: your-repository-name
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: latest
+    - name: Additional AWS Actions
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        # Your AWS CLI commands or scripts that use AWS credentials
+        aws s3 ls
 
-    - name: Logout from Amazon ECR
+    - name: Clean up Actions
       if: always()
-      run: docker logout ${{ steps.login-ecr.outputs.registry }}
+      run: |
+        # Any cleanup tasks or final steps
+        echo "Clean up complete"
