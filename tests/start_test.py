@@ -29,10 +29,7 @@ async def test_create_qr_code_unauthorized():
 
 @pytest.mark.asyncio
 async def test_create_and_delete_qr_code():
-    form_data = {
-        "username": "admin",
-        "password": "secret",
-    }
+    form_data = {"username": "admin", "password": "secret"}
     async with AsyncClient(app=app, base_url="http://test") as ac:
         token_response = await ac.post("/token", data=form_data)
         access_token = token_response.json()["access_token"]
@@ -50,7 +47,14 @@ async def test_create_and_delete_qr_code():
         if create_response.status_code == 201:
             qr_code_url = create_response.json()["qr_code_url"]
             qr_filename = qr_code_url.split('/')[-1]
-            delete_url = f"/qr-codes/?qr_filename={qr_filename}"
+            delete_url = f"/qr-codes/{qr_filename}"  # Adjusted for path parameters
             delete_response = await ac.delete(delete_url, headers=headers)
-            print(f"Attempting to delete QR code at: {delete_url} with headers: {headers}")
-            assert delete_response.status_code == 204
+            assert delete_response.status_code == 204  # Expecting No Content
+
+
+from fastapi import Query
+
+@app.delete("/qr-codes/")
+async def delete_qr_code(qr_filename: str = Query(..., alias='qr_filename')):
+    # Deletion logic here
+    return {"message": "QR code deleted"}
