@@ -58,15 +58,15 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: yourdockerhubusername/docker_demo:${{ github.sha }}  # Modify 'yourdockerhubusername' to your actual DockerHub username
+          tags: hemanjalik/docker_demo:${{ github.sha }}  # Modify 'yourdockerhubusername' to your actual DockerHub username
           platforms: linux/amd64,linux/arm64  # Multi-platform support
-          cache-from: type=registry,ref=yourdockerhubusername/docker_demo:cache  # Modify 'yourdockerhubusername' to your actual DockerHub username
+          cache-from: type=registry,ref=hemanjalik/docker_demo:cache  # Modify 'yourdockerhubusername' to your actual DockerHub username
           cache-to: type=inline,mode=max
           
       - name: Scan the Docker image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'yourdockerhubusername/docker_demo:${{ github.sha }}'  # Modify 'yourdockerhubusername' to your actual DockerHub username
+          image-ref: 'hemanjalik/docker_demo:${{ github.sha }}'  # Modify 'yourdockerhubusername' to your actual DockerHub username
           format: 'table'
           exit-code: '1'  # Fail the job if vulnerabilities are found
           ignore-unfixed: true
