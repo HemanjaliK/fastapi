@@ -6,21 +6,23 @@ on:
       - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: your-region
-          role-to-assume: arn:aws:iam::123456789012:HemanjaliK/fastapi
-          role-duration-seconds: 3600
-          role-session-name: GitHubActionsSession
-          role-skip-session-tagging: false
-          audience: sts.amazonaws.com
-
-      - name: Execute AWS Commands
-        run: |
-          aws s3 ls
+        deploy:
+          runs-on: ubuntu-latest
+          steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+      
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                aws-region: your-region
+                role-to-assume: arn:aws:iam::123456789012:role/HemanjaliK-fastapi
+                role-duration-seconds: 3600
+                role-session-name: GitHubActionsSession
+                role-skip-session-tagging: false
+                audience: sts.amazonaws.com
+      
+            - name: Additional AWS steps
+              run: |
+                # Your AWS commands here
+      
