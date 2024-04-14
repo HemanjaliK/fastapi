@@ -41,7 +41,7 @@ jobs:
   build-and-push-docker:
     needs: test
     runs-on: ubuntu-latest
-    environment: env
+    environment: production  # Ensure this environment is defined in your repo settings
     steps:
       - uses: actions/checkout@v4
       
@@ -58,16 +58,16 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: HemanjaliK/docker_demo:${{ github.sha }} # Uses the Git SHA for tagging
-          platforms: linux/amd64,linux/arm64 # Multi-platform support
-          cache-from: type=registry,ref=HemanjaliK/docker_demo:cache
+          tags: yourdockerhubusername/docker_demo:${{ github.sha }}  # Modify 'yourdockerhubusername' to your actual DockerHub username
+          platforms: linux/amd64,linux/arm64  # Multi-platform support
+          cache-from: type=registry,ref=yourdockerhubusername/docker_demo:cache  # Modify 'yourdockerhubusername' to your actual DockerHub username
           cache-to: type=inline,mode=max
           
       - name: Scan the Docker image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'HemanjaliK/docker_demo:${{ github.sha }}'
+          image-ref: 'yourdockerhubusername/docker_demo:${{ github.sha }}'  # Modify 'yourdockerhubusername' to your actual DockerHub username
           format: 'table'
-          exit-code: '1' # Fail the job if vulnerabilities are found
+          exit-code: '1'  # Fail the job if vulnerabilities are found
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
