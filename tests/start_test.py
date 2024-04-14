@@ -34,12 +34,10 @@ async def test_create_and_delete_qr_code():
         "password": "secret",
     }
     async with AsyncClient(app=app, base_url="http://test") as ac:
-        # Login and get the access token
         token_response = await ac.post("/token", data=form_data)
         access_token = token_response.json()["access_token"]
         headers = {"Authorization": f"Bearer {access_token}"}
 
-        # Create a QR code
         qr_request = {
             "url": "https://example.com",
             "fill_color": "red",
@@ -49,12 +47,10 @@ async def test_create_and_delete_qr_code():
         create_response = await ac.post("/qr-codes/", json=qr_request, headers=headers)
         assert create_response.status_code in [201, 409]
 
-        # If the QR code was created, attempt to delete it
         if create_response.status_code == 201:
             qr_code_url = create_response.json()["qr_code_url"]
             qr_filename = qr_code_url.split('/')[-1]
-            # Modify here to include qr_filename as a query parameter
             delete_url = f"/qr-codes/?qr_filename={qr_filename}"
             delete_response = await ac.delete(delete_url, headers=headers)
-            print(f"Attempting to delete QR code: {qr_filename} with response: {delete_response.json()}")
+            print(f"Attempting to delete QR code at: {delete_url} with headers: {headers}")
             assert delete_response.status_code == 204
