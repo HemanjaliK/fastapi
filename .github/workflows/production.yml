@@ -9,22 +9,22 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: your-region
-          role-to-assume: your-role-arn
-          role-duration-seconds: 3600
-          role-session-name: GitHubActionsSession
-          role-skip-session-tagging: false
-          audience: sts.amazonaws.com
+          aws-region: your-region  # Specify the AWS region, e.g., us-east-1
+          role-to-assume: your-role-arn  # ARN of the AWS IAM role to assume
+          role-duration-seconds: 3600  # The duration in seconds for the role assumption
+          role-session-name: GitHubActionsSession  # An identifier for the session
+          role-skip-session-tagging: false  # Whether to skip session tagging
+          audience: sts.amazonaws.com  # Expected audience in the role's trust policy
 
       - name: Deploy to AWS
         run: |
-          # Your AWS CLI commands or deployment scripts
+          # Your deployment commands using AWS CLI or other tools
           echo "Deploying to AWS..."
-          # Example: Upload a file to an S3 bucket
-          aws s3 cp ./your-file.txt s3://your-bucket-name/
+          # For example, deploy a CloudFormation stack
+          aws cloudformation deploy --template-file template.yaml --stack-name my-stack
